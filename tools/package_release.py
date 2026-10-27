@@ -17,7 +17,7 @@ from pathlib import Path, PurePosixPath
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from evidence_ledger.audit import safe_file, verify_bundle  # noqa: E402
+from evidence_ledger.audit import read_object, safe_file, verify_bundle  # noqa: E402
 from evidence_ledger.history import verify_history  # noqa: E402
 from evidence_ledger.model import InputError, sha256  # noqa: E402
 from evidence_ledger.transport import utcnow  # noqa: E402
@@ -49,9 +49,29 @@ def add_tree(archive, root, prefix):
             write_bytes(archive, prefix + "/" + relative, safe_file(root, relative).read_bytes())
 
 
+def add_history(archive, root, result):
+    # A sealed history links round manifests, which in turn list source files.
+    # Unlisted notes or unrelated files in the directory are never copied.
+    names = set(result["files_to_seal"]) | {"history-manifest.json"}
+    for relative in result["files_to_seal"]:
+        if relative.endswith("/manifest.json"):
+            manifest = read_object(safe_file(root, relative))
+            prefix = PurePosixPath(relative).parent
+            names.update((prefix / path).as_posix() for path in manifest["files"])
+    for relative in sorted(names):
+        path = safe_file(root, relative)
+        if not path.is_file():
+            raise InputError("sealed history entry is not a regular file")
+        write_bytes(archive, "artifacts/maintenance-pilot/" + relative, path.read_bytes())
+
+
 def build(sdist, wheel, history, cloud, output):
     if output.exists():
         raise InputError("release output already exists")
+    if not sdist.name.endswith(".tar.gz") or not wheel.name.endswith(".whl"):
+        raise InputError("expected distinct .tar.gz source and .whl distribution files")
+    if not zipfile.is_zipfile(wheel):
+        raise InputError("wheel is not a ZIP distribution")
     history_result = verify_history(history)
     if history_result["status"] == "running" or not history_result["sealed"]:
         raise InputError("release history must have ended and been sealed")
@@ -95,15 +115,14 @@ def build(sdist, wheel, history, cloud, output):
                     write_bytes(
                         archive, relative, source.extractfile(member).read(), member.mode & 0o777
                     )
-            add_tree(archive, history, "artifacts/maintenance-pilot")
+            add_history(archive, history, history_result)
             if cloud:
                 add_tree(archive, cloud, "artifacts/cloud-run")
             write_bytes(
                 archive, "release-index.json", (json.dumps(receipt, indent=2) + "\n").encode()
             )
             title = "Evidence Ledger · 可复核交付包"
-            body = (
-                """<!doctype html>
+            body = """<!doctype html>
 <html lang="zh-CN">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -133,21 +152,19 @@ def build(sdist, wheel, history, cloud, output):
 <small>差异需要人工审核。哈希与离线重算证明内部一致性，不提供独立签名、可信采集时间或收入承诺。持续巡检运行状态：%s。</small>
 </p>
 </main>
-</html>"""
-                % (
-                    html.escape(title),
-                    html.escape(title),
-                    history_result["completed_rounds_verified"],
-                    history_result["failed_rounds"],
-                    history_result["unique_input_records"],
-                    history_result["unique_package_queries_per_round"],
-                    history_result["record_observations_verified"],
-                    history_result["unavailable_record_observations"],
-                    '<li><a href="artifacts/cloud-run/report.html">独立保存的云端巡检报告</a></li>'
-                    if cloud
-                    else "",
-                    html.escape(history_result["status"]),
-                )
+</html>""" % (
+                html.escape(title),
+                html.escape(title),
+                history_result["completed_rounds_verified"],
+                history_result["failed_rounds"],
+                history_result["unique_input_records"],
+                history_result["unique_package_queries_per_round"],
+                history_result["record_observations_verified"],
+                history_result["unavailable_record_observations"],
+                '<li><a href="artifacts/cloud-run/report.html">独立保存的云端巡检报告</a></li>'
+                if cloud
+                else "",
+                html.escape(history_result["status"]),
             )
             write_bytes(archive, "DELIVERY.html", body.encode())
         # Verify the actual portable bytes, not only the directories copied in.

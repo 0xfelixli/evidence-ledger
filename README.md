@@ -9,7 +9,7 @@
 ## 先看实际成果
 
 - `artifacts/catalog-reviewed/report.html`：固定提交版本的 Chain.Love 目录样本，24 条记录；14 条存在依赖声明差异、10 条一致。全部原始来源已留存。
-- 持续巡检试运行完成后，会另附完整的 `artifacts/maintenance-pilot/` 证据包；源码快照不包含尚在写入的日志。
+- 完整的 `artifacts/maintenance-pilot/` 多轮巡检证据作为发布制品另附；源码快照不包含正在写入的日志。请读取对应制品中的实际状态与已完成轮次。
 - `docs/CASE-STUDY.zh-CN.md`：逐条审核、可选 peer 依赖边界、已有 PR 和哪些发现不算新贡献。
 - `artifacts/quickstart/report.html`：npm / PyPI 双来源采集示例。没有提供目录断言，因此只记为“仅采集”。
 
@@ -149,6 +149,14 @@ PYTHONPATH=src python3 -m unittest discover -s tests -v
 ```
 
 包含故障注入、身份/格式验证、证据篡改与语义复算、原子输出、CSV/HTML 注入处理、离线无网络验证和有截止时间的持续巡检。测试不是对所有注册表边缘情况的保证，具体实测记录见 `docs/VALIDATION.md`。
+
+## 离线负载检查
+
+```sh
+python3 tools/benchmark_distinct.py --records 2000 --out runs/synthetic-distinct
+```
+
+该命令生成虚拟包名和响应，阻断 DNS 与网络连接，检验多组不同来源、并发上限及预设失败/差异的处理。它不查询真实软件包，也不把模拟记录计作真实发现。已执行的 5,000 组测试指标和边界见 `docs/VALIDATION.md`。
 
 ## 来源与许可
 

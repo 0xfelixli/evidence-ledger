@@ -71,3 +71,13 @@ The workflow action references were refreshed against their [official checkout](
 ## Portable handover builder
 
 The release builder accepts an explicitly supplied sdist/wheel and an ended, sealed history. It packages no arbitrary working-directory tree, preserves launcher modes, computes distribution checksums, then extracts its own portable ZIP and re-verifies the bundled case/history/cloud reports. A real one-round, four-package quickstart history was used for an initial packaging smoke test; this is a packaging check, not the long-running pilot or four hours of observations. The final long-running pilot remains separate until its actual stop time.
+
+## Distinct-source synthetic stress check
+
+`python3 tools/benchmark_distinct.py --records 5000 --out runs/synthetic-distinct-5000` generated **5,000 distinct artificial package identities** and blocked DNS/connection creation. The synthetic transport produced 100 empty envelopes, 100 version mismatches and 4,800 matching version declarations. The actual report classified those states exactly, and all 5,000 records independently verified offline. Four configured workers reached four simultaneous simulated GET calls. Zero public packages were fetched, and none of these rows are counted as real findings.
+
+Measured on this host: audit with tracemalloc 3.547 seconds; verification without tracemalloc 1.428 seconds; peak traced Python allocation during audit 62,226,087 bytes. These are workload-specific measurements, not live-registry throughput or process-RAM guarantees. Raw metrics: `artifacts/benchmark-distinct-5000-metrics.json`.
+
+The long-running live pilot was started with the development code loaded at 16:05 UTC; later source edits do not retroactively upgrade that process. Its ended bundles will be checked with the final release verifier. Only entries actually present in its history count as completed observations.
+
+The portable builder was additionally exercised with an unlisted sentinel note in the smoke-history directory. The note and its contents were absent from the resulting ZIP: only sealed index/delta files and transitively manifest-listed round files were copied. The real long-running history is still kept separate until ended.

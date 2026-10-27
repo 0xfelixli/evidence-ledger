@@ -89,6 +89,8 @@ Exit codes: `0` completed, `1` differences with `--fail-on-change`, `2` unavaila
 PYTHONPATH=src python3 -m unittest discover -s tests -v
 ```
 
+For an offline distinct-source stress check, run `python3 tools/benchmark_distinct.py --records 2000 --out runs/synthetic-distinct`. DNS and connection creation are blocked; generated identities and injected failures are synthetic, not real package research.
+
 See [performed validation](docs/VALIDATION.md). Tests cover failure injection, wrong identities, malformed sources, output tampering, offline recomputation, interrupted monitoring, local HTTP boundaries and malformed evidence bundles. The saved case and cloud run are actual observations; the 10,000-row performance benchmark is explicitly synthetic repeated input, not 10,000 independent package checks.
 
 Original code: MIT. Chain.Love catalog data, derived assertions and corresponding report data retain **CC BY-SA 4.0** attribution/share-alike terms. Publisher metadata rights remain with the respective owners; see [NOTICE](NOTICE.md). This is AI-assisted original work. No customer acceptance, upstream merge or earnings are asserted.

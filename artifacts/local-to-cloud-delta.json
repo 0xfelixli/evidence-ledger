@@ -1,0 +1,131 @@
+{
+  "format_version": 1,
+  "before_finished_at": "2026-10-27T16:03:08.229Z",
+  "after_finished_at": "2026-10-27T17:17:04.209Z",
+  "summary": {
+    "unchanged_verified": 24
+  },
+  "results": [
+    {
+      "record_id": "algokit-avm-debugger",
+      "state": "unchanged_verified",
+      "changes": []
+    },
+    {
+      "record_id": "algokit-client-generator-ts",
+      "state": "unchanged_verified",
+      "changes": []
+    },
+    {
+      "record_id": "algokit-subscriber-ts",
+      "state": "unchanged_verified",
+      "changes": []
+    },
+    {
+      "record_id": "algokit-utils-ts",
+      "state": "unchanged_verified",
+      "changes": []
+    },
+    {
+      "record_id": "ankr-sdk",
+      "state": "unchanged_verified",
+      "changes": []
+    },
+    {
+      "record_id": "circle-bridge-kit",
+      "state": "unchanged_verified",
+      "changes": []
+    },
+    {
+      "record_id": "ens-js",
+      "state": "unchanged_verified",
+      "changes": []
+    },
+    {
+      "record_id": "folks-algorand-sdk",
+      "state": "unchanged_verified",
+      "changes": []
+    },
+    {
+      "record_id": "iso-filecoin-react",
+      "state": "unchanged_verified",
+      "changes": []
+    },
+    {
+      "record_id": "iso-filecoin-wallets",
+      "state": "unchanged_verified",
+      "changes": []
+    },
+    {
+      "record_id": "metamask-eth-sig-util",
+      "state": "unchanged_verified",
+      "changes": []
+    },
+    {
+      "record_id": "pera-connect",
+      "state": "unchanged_verified",
+      "changes": []
+    },
+    {
+      "record_id": "safe-api-kit",
+      "state": "unchanged_verified",
+      "changes": []
+    },
+    {
+      "record_id": "safe-protocol-kit",
+      "state": "unchanged_verified",
+      "changes": []
+    },
+    {
+      "record_id": "safe-relay-kit",
+      "state": "unchanged_verified",
+      "changes": []
+    },
+    {
+      "record_id": "solc-js",
+      "state": "unchanged_verified",
+      "changes": []
+    },
+    {
+      "record_id": "somnia-accounts-sdk",
+      "state": "unchanged_verified",
+      "changes": []
+    },
+    {
+      "record_id": "somnia-contracts-sdk",
+      "state": "unchanged_verified",
+      "changes": []
+    },
+    {
+      "record_id": "somnia-data-streams-sdk",
+      "state": "unchanged_verified",
+      "changes": []
+    },
+    {
+      "record_id": "somnia-viem-session-account",
+      "state": "unchanged_verified",
+      "changes": []
+    },
+    {
+      "record_id": "synapse-core",
+      "state": "unchanged_verified",
+      "changes": []
+    },
+    {
+      "record_id": "synapse-react",
+      "state": "unchanged_verified",
+      "changes": []
+    },
+    {
+      "record_id": "synapse-sdk",
+      "state": "unchanged_verified",
+      "changes": []
+    },
+    {
+      "record_id": "viem",
+      "state": "unchanged_verified",
+      "changes": []
+    }
+  ],
+  "scope": "Comparison of saved verified observations. Missing source evidence is not an unchanged result; changed configuration is not a source change."
+}

@@ -1,0 +1,22 @@
+{
+  "benchmark_kind": "synthetic_distinct_sources",
+  "real_network_requests": 0,
+  "generated_records": 5000,
+  "unique_fixture_queries": 5000,
+  "workers": 4,
+  "maximum_concurrent_gets": 4,
+  "summary": {
+    "changed": 100,
+    "unchanged": 4800,
+    "observed": 0,
+    "unavailable": 100,
+    "total": 5000,
+    "compared": 5000,
+    "differences": 100
+  },
+  "offline_records_verified": 5000,
+  "audit_seconds_with_tracemalloc": 3.547,
+  "verify_seconds_without_tracemalloc": 1.428,
+  "peak_traced_python_allocation_during_audit_bytes": 62226087,
+  "scope": "Artificial identities and responses with injected missing evidence and version differences. No real package research or live-registry throughput claim."
+}

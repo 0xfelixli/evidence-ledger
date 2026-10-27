@@ -15,3 +15,6 @@ include sources/triage/search-status.json
 recursive-include artifacts/catalog-reviewed *.json *.csv *.html
 recursive-include artifacts/quickstart *.json *.csv *.html
 include artifacts/qa/desktop.png
+include artifacts/benchmark-distinct-5000-metrics.json
+include artifacts/cloud-run-receipt.json
+include artifacts/local-to-cloud-delta.json
