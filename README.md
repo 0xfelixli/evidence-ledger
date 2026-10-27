@@ -7,7 +7,7 @@
 ## 先看实际成果
 
 - `artifacts/catalog-reviewed/report.html`：固定提交版本的 Chain.Love 目录样本，24 条记录；14 条存在依赖声明差异、10 条一致。全部原始来源已留存。
-- `artifacts/maintenance-pilot/index.html`：同一批来源的多轮巡检记录；只有已完成的轮次才算实际采集，运行状态以页面为准。
+- 持续巡检试运行完成后，会另附完整的 `artifacts/maintenance-pilot/` 证据包；源码快照不包含尚在写入的日志。
 - `docs/CASE-STUDY.zh-CN.md`：逐条审核、可选 peer 依赖边界、已有 PR 和哪些发现不算新贡献。
 - `artifacts/quickstart/report.html`：npm / PyPI 双来源采集示例。没有提供目录断言，因此只记为“仅采集”。
 
@@ -15,7 +15,7 @@
 
 ## 不想输入命令：本地网页工作台
 
-macOS 可双击 `启动工作台.command`，或执行：
+macOS 本地可双击 `启动工作台.command`。从 GitHub 下载的文件可能缺少可执行权限，可先运行 `chmod +x 启动工作台.command`，或直接执行：
 
 ```sh
 python3 run.py serve --out runs/workbench --example examples/chain-love-npm.csv --open

@@ -9,8 +9,8 @@
 原始 CSV、来源 URL、提交信息、文件哈希和许可位于 `sources/chain-love/`。输入是 `examples/chain-love-npm.csv`。依赖比较口径固定为发布版本的 **runtime + peer**，排除开发、传递和 `optionalDependencies`，但包含声明为可选的 peer。因此必须结合下文解释，不能把所有差异都当成同一类错误。
 
 ```sh
-./evidence-ledger audit examples/chain-love-npm.csv --out runs/catalog-check
-./evidence-ledger verify runs/catalog-check
+python3 run.py audit examples/chain-love-npm.csv --out runs/catalog-check
+python3 run.py verify runs/catalog-check
 ```
 
 `artifacts/catalog-reviewed/` 保存了 2026-10-27 16:03 UTC 的实测结果：**24 条可核实，14 条依赖声明不同，10 条一致**。将来重跑可能变化，请以新报告中的时间和原始证据为准。
