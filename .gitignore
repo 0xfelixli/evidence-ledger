@@ -13,3 +13,6 @@ htmlcov/
 .ruff_cache/
 publish-tree/
 releases/
+WORKLOG.md
+*.log
+artifacts/maintenance-pilot/
