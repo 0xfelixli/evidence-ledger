@@ -54,6 +54,14 @@ evidence-ledger --help
 
 运行时无第三方依赖；打包安装时使用 setuptools。
 
+## 在 GitHub 手动运行
+
+仓库的 Actions → `manual-public-catalog-audit` → `Run workflow` 会在 GitHub 的 Linux runner 上查询公开的 24 条案例记录，独立复核后提供可下载的 `public-catalog-evidence-运行ID` 压缩包，保留 7 天。下载、解压后打开 `report.html` 即可；运行者需要仓库 Actions 操作权限。
+
+这是按次手动触发的工作流，没有定时计划。输入固定为 `examples/chain-love-npm.csv`；若 fork 后改成自己的数据，注意公开仓库的日志和制品也可能对外可见。工作流只读仓库和公开 registry，不需要自行配置凭证。
+
+发现差异仍是正常完成；如果存在无法核实的来源，采集步骤会返回非零状态，但后续仍尝试验证并上传完整证据包。以报告中的状态逐条判断，不能把工作流图标当成目录安全或正确性的证明。
+
 ## 输入 CSV
 
 必填三列：`record_id,ecosystem,package`。可选列如下：

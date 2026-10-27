@@ -1,0 +1,29 @@
+name: manual-public-catalog-audit
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
+        with:
+          python-version: '3.13'
+      - name: Read public registry metadata (differences are review candidates)
+        run: python run.py audit examples/chain-love-npm.csv --out runs/manual-check --timeout 15 --retries 1
+      - name: Independently verify saved evidence and exports
+        if: ${{ !cancelled() }}
+        run: python run.py verify runs/manual-check
+      - name: Preserve report even if some sources were unavailable
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: public-catalog-evidence-${{ github.run_id }}
+          path: runs/manual-check/
+          if-no-files-found: error
+          retention-days: 7
