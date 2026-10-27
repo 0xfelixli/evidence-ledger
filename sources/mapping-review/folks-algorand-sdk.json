@@ -1,0 +1,64 @@
+{
+  "name": "@folks-finance/algorand-sdk",
+  "version": "0.2.6",
+  "description": "The official JavaScript SDK for the Folks Finance Protocol",
+  "main": "dist/index.js",
+  "types": "dist/types/index.d.ts",
+  "files": [
+    "dist/**/*",
+    "src"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Folks-Finance/algorand-js-sdk.git"
+  },
+  "scripts": {
+    "prepare": "husky",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --write 'src/**/*'",
+    "gen-docs": "typedoc",
+    "example": "pnpx tsx",
+    "release": "pnpm build && changeset publish"
+  },
+  "peerDependencies": {
+    "@algorandfoundation/algokit-utils": "^9.0.0",
+    "algosdk": "^3.0.0"
+  },
+  "devDependencies": {
+    "@algorandfoundation/algokit-utils": "^9.2.0",
+    "@changesets/changelog-github": "^0.5.2",
+    "@changesets/cli": "^2.30.0",
+    "@eslint/js": "^9.39.4",
+    "@types/node": "^22.19.15",
+    "@typescript-eslint/parser": "^8.57.1",
+    "@typhonjs-typedoc/typedoc-theme-dmt": "^0.3.1",
+    "algosdk": "^3.5.2",
+    "eslint": "^9.39.4",
+    "eslint-config-prettier": "^9.1.2",
+    "eslint-import-resolver-typescript": "^3.10.1",
+    "eslint-plugin-import-x": "^4.16.2",
+    "eslint-plugin-unicorn": "^56.0.1",
+    "globals": "^15.15.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.2",
+    "prettier": "^3.8.1",
+    "typedoc": "^0.27.9",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.57.1"
+  },
+  "author": "Folks Finance",
+  "license": "MIT",
+  "lint-staged": {
+    "*.src/**/*": "prettier --write"
+  },
+  "packageManager": "pnpm@9.15.0+sha512.76e2379760a4328ec4415815bcd6628dee727af3779aaa4c914e3944156c4299921a89f976381ee107d41f12cfa4b66681ca9c718f0668fa0831ed4c6d8ba56c",
+  "keywords": [
+    "folks-finance",
+    "lending",
+    "algorand",
+    "blockchain",
+    "defi"
+  ]
+}

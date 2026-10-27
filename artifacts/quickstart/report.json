@@ -1,0 +1,275 @@
+{
+  "finished_at": "2026-10-27T16:01:28.598Z",
+  "format_version": 1,
+  "input_sha256": "192031828ba79d646a38184e3f6a59196f988713748e1e7ee49e014d65c2db14",
+  "mode": "live",
+  "results": [
+    {
+      "differences": [],
+      "error": null,
+      "observed": {
+        "dependencies": [
+          "@tanstack/react-query@>=5.0.0",
+          "iso-filecoin-wallets@^1.3.1",
+          "iso-filecoin@^7.4.8",
+          "react@>=18"
+        ],
+        "dependency_groups": {
+          "optional": {},
+          "peer": {
+            "@tanstack/react-query": ">=5.0.0",
+            "iso-filecoin": "^7.4.8",
+            "react": ">=18"
+          },
+          "runtime": {
+            "iso-filecoin-wallets": "^1.3.1"
+          }
+        },
+        "deprecated": null,
+        "license": "MIT",
+        "notes": [],
+        "repository": "hugomrdias/filecoin",
+        "repository_directory": "packages/iso-filecoin-react",
+        "version": "2.2.1"
+      },
+      "receipts": [
+        {
+          "body_path": "evidence/a24fff5ea26938b1f4cd099cd248391d8d2e577e57d59448ac97303893c7c363.json",
+          "bytes": 3046,
+          "elapsed_ms": 828,
+          "error": null,
+          "fetched_at": "2026-10-27T16:01:25.956Z",
+          "headers": {
+            "content-length": "3046",
+            "content-type": "application/json",
+            "date": "Tue, 27 Oct 2026 16:01:26 GMT",
+            "last-modified": "Tue, 27 Oct 2026 16:01:20 GMT"
+          },
+          "http_status": 200,
+          "sha256": "a24fff5ea26938b1f4cd099cd248391d8d2e577e57d59448ac97303893c7c363",
+          "truncated": false,
+          "url": "https://registry.npmjs.org/iso-filecoin-react/latest"
+        }
+      ],
+      "record": {
+        "dependency_scope": "runtime+peer",
+        "ecosystem": "npm",
+        "expected": {},
+        "package": "iso-filecoin-react",
+        "record_id": "npm-iso-filecoin-react",
+        "selector": "latest",
+        "source_ref": "Observation-only quickstart. No catalog assertions supplied."
+      },
+      "source_url": "https://registry.npmjs.org/iso-filecoin-react/latest",
+      "state": "observed",
+      "unknown_fields": []
+    },
+    {
+      "differences": [],
+      "error": null,
+      "observed": {
+        "dependencies": [
+          "@hugomrdias/commp-wasm@0.1.4",
+          "dnum@2.17.0",
+          "iso-web@^3.1.2",
+          "multiformats@14.0.5",
+          "ox@0.14.34",
+          "p-locate@7.0.0",
+          "p-some@7.0.0",
+          "sync-multihash-sha2@1.0.0",
+          "viem@2.x",
+          "zod@4.4.3"
+        ],
+        "dependency_groups": {
+          "optional": {},
+          "peer": {
+            "viem": "2.x"
+          },
+          "runtime": {
+            "@hugomrdias/commp-wasm": "0.1.4",
+            "dnum": "2.17.0",
+            "iso-web": "^3.1.2",
+            "multiformats": "14.0.5",
+            "ox": "0.14.34",
+            "p-locate": "7.0.0",
+            "p-some": "7.0.0",
+            "sync-multihash-sha2": "1.0.0",
+            "zod": "4.4.3"
+          }
+        },
+        "deprecated": null,
+        "license": "Apache-2.0 OR MIT",
+        "notes": [],
+        "repository": "https://github.com/FilOzone/synapse-sdk",
+        "repository_directory": null,
+        "version": "0.10.2"
+      },
+      "receipts": [
+        {
+          "body_path": "evidence/1edf7e1c87c26902a7c9d2c426110808a7fd646ae588b952d64fdf53df0eb8b9.json",
+          "bytes": 6144,
+          "elapsed_ms": 2632,
+          "error": null,
+          "fetched_at": "2026-10-27T16:01:25.958Z",
+          "headers": {
+            "content-length": "6144",
+            "content-type": "application/json",
+            "date": "Tue, 27 Oct 2026 16:01:28 GMT"
+          },
+          "http_status": 200,
+          "sha256": "1edf7e1c87c26902a7c9d2c426110808a7fd646ae588b952d64fdf53df0eb8b9",
+          "truncated": false,
+          "url": "https://registry.npmjs.org/@filoz%2Fsynapse-core/latest"
+        }
+      ],
+      "record": {
+        "dependency_scope": "runtime+peer",
+        "ecosystem": "npm",
+        "expected": {},
+        "package": "@filoz/synapse-core",
+        "record_id": "npm-@filoz/synapse-core",
+        "selector": "latest",
+        "source_ref": "Observation-only quickstart. No catalog assertions supplied."
+      },
+      "source_url": "https://registry.npmjs.org/@filoz%2Fsynapse-core/latest",
+      "state": "observed",
+      "unknown_fields": []
+    },
+    {
+      "differences": [],
+      "error": null,
+      "observed": {
+        "dependencies": [
+          "PySocks!=1.5.7,>=1.5.6; extra == \"socks\"",
+          "certifi>=2023.5.7",
+          "chardet<8,>=3.0.2; extra == \"use-chardet-on-py3\"",
+          "charset_normalizer<4,>=2",
+          "idna<4,>=2.5",
+          "urllib3<3,>=1.26"
+        ],
+        "last_serial": 37059094,
+        "license": "Apache-2.0",
+        "notes": [
+          "PyPI requirements include markers/extras verbatim; this is metadata comparison, not dependency resolution.",
+          "License is a legacy publisher-supplied string, not a validated SPDX expression.",
+          "Publisher declares dynamic metadata: ['License-File']"
+        ],
+        "repository": "https://github.com/psf/requests",
+        "version": "2.34.2"
+      },
+      "receipts": [
+        {
+          "body_path": "evidence/bcfc6a202592e4e90f5a28ff002694eaa7c58ba741b76077f432b8bee1480111.json",
+          "bytes": 192973,
+          "elapsed_ms": 1248,
+          "error": null,
+          "fetched_at": "2026-10-27T16:01:25.959Z",
+          "headers": {
+            "content-length": "192973",
+            "content-type": "application/json",
+            "date": "Tue, 27 Oct 2026 16:01:26 GMT",
+            "etag": "\"PIda7csZtWyaGzro3RbDQA\"",
+            "x-pypi-last-serial": "37059094"
+          },
+          "http_status": 200,
+          "sha256": "bcfc6a202592e4e90f5a28ff002694eaa7c58ba741b76077f432b8bee1480111",
+          "truncated": false,
+          "url": "https://pypi.org/pypi/requests/json"
+        }
+      ],
+      "record": {
+        "dependency_scope": "requires-dist",
+        "ecosystem": "pypi",
+        "expected": {},
+        "package": "requests",
+        "record_id": "pypi-requests",
+        "selector": "latest",
+        "source_ref": "Observation-only quickstart. No catalog assertions supplied."
+      },
+      "source_url": "https://pypi.org/pypi/requests/json",
+      "state": "observed",
+      "unknown_fields": []
+    },
+    {
+      "differences": [],
+      "error": null,
+      "observed": {
+        "dependencies": [
+          "attrs>=22.2.0",
+          "fqdn; extra == \"format\"",
+          "fqdn; extra == \"format-nongpl\"",
+          "idna; extra == \"format\"",
+          "idna; extra == \"format-nongpl\"",
+          "isoduration; extra == \"format\"",
+          "isoduration; extra == \"format-nongpl\"",
+          "jsonpointer>1.13; extra == \"format\"",
+          "jsonpointer>1.13; extra == \"format-nongpl\"",
+          "jsonschema-specifications>=2023.03.6",
+          "referencing>=0.28.4",
+          "rfc3339-validator; extra == \"format\"",
+          "rfc3339-validator; extra == \"format-nongpl\"",
+          "rfc3986-validator>0.1.0; extra == \"format-nongpl\"",
+          "rfc3987-syntax>=1.1.0; extra == \"format-nongpl\"",
+          "rfc3987; extra == \"format\"",
+          "rpds-py>=0.25.0",
+          "uri-template; extra == \"format\"",
+          "uri-template; extra == \"format-nongpl\"",
+          "webcolors>=1.11; extra == \"format\"",
+          "webcolors>=24.6.0; extra == \"format-nongpl\""
+        ],
+        "last_serial": 33402435,
+        "license": "MIT",
+        "notes": [
+          "PyPI requirements include markers/extras verbatim; this is metadata comparison, not dependency resolution."
+        ],
+        "repository": "https://github.com/python-jsonschema/jsonschema",
+        "version": "4.26.0"
+      },
+      "receipts": [
+        {
+          "body_path": "evidence/697a0d4384e479461a5c84357a5d0d495dd1aeec1f42ad13ae7209112faaaec9.json",
+          "bytes": 178092,
+          "elapsed_ms": 813,
+          "error": null,
+          "fetched_at": "2026-10-27T16:01:25.961Z",
+          "headers": {
+            "content-length": "178092",
+            "content-type": "application/json",
+            "date": "Tue, 27 Oct 2026 16:01:26 GMT",
+            "etag": "\"I5GmCvzhRyFqPloPh0wIeA\"",
+            "x-pypi-last-serial": "33402435"
+          },
+          "http_status": 200,
+          "sha256": "697a0d4384e479461a5c84357a5d0d495dd1aeec1f42ad13ae7209112faaaec9",
+          "truncated": false,
+          "url": "https://pypi.org/pypi/jsonschema/json"
+        }
+      ],
+      "record": {
+        "dependency_scope": "requires-dist",
+        "ecosystem": "pypi",
+        "expected": {},
+        "package": "jsonschema",
+        "record_id": "pypi-jsonschema",
+        "selector": "latest",
+        "source_ref": "Observation-only quickstart. No catalog assertions supplied."
+      },
+      "source_url": "https://pypi.org/pypi/jsonschema/json",
+      "state": "observed",
+      "unknown_fields": []
+    }
+  ],
+  "scope": "Publisher-declared package metadata; differences require human review. Not vulnerability scanning, installability testing, or upgrade advice.",
+  "started_at": "2026-10-27T16:01:25.956Z",
+  "summary": {
+    "changed": 0,
+    "compared": 0,
+    "differences": 0,
+    "observed": 4,
+    "total": 4,
+    "unavailable": 0,
+    "unchanged": 0
+  },
+  "tool_version": "0.1.0",
+  "unique_sources": 4
+}

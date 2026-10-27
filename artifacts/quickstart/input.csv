@@ -1,0 +1,5 @@
+record_id,ecosystem,package,selector,expected_version,expected_dependencies,dependency_scope,source_ref
+npm-iso-filecoin-react,npm,iso-filecoin-react,latest,,,runtime+peer,Observation-only quickstart. No catalog assertions supplied.
+npm-@filoz/synapse-core,npm,@filoz/synapse-core,latest,,,runtime+peer,Observation-only quickstart. No catalog assertions supplied.
+pypi-requests,pypi,requests,latest,,,requires-dist,Observation-only quickstart. No catalog assertions supplied.
+pypi-jsonschema,pypi,jsonschema,latest,,,requires-dist,Observation-only quickstart. No catalog assertions supplied.

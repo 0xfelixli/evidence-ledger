@@ -1,0 +1,4 @@
+#!/bin/sh
+# Run directly from the source tree; installation is optional.
+LEDGER_ROOT=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+PYTHONPATH="$LEDGER_ROOT/src${PYTHONPATH:+:$PYTHONPATH}" exec python3 -m evidence_ledger "$@"

@@ -1,0 +1,110 @@
+{
+  "name": "@filoz/synapse-react",
+  "version": "0.5.1",
+  "description": "React hooks for interacting with Filecoin Onchain Cloud smart contracts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FilOzone/synapse-sdk.git"
+  },
+  "keywords": [
+    "filecoin",
+    "synapse",
+    "filecoin pay",
+    "filecoin onchain cloud",
+    "web3",
+    "react",
+    "hooks"
+  ],
+  "author": "Hugo Dias <hugomrdias@gmail.com>",
+  "license": "Apache-2.0 OR MIT",
+  "bugs": {
+    "url": "https://github.com/FilOzone/synapse-sdk/issues"
+  },
+  "homepage": "https://github.com/FilOzone/synapse-sdk/tree/main/packages/synapse-react",
+  "type": "module",
+  "main": "dist/src/index.js",
+  "module": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./dist/src/index.js"
+    },
+    "./filsnap": {
+      "types": "./dist/src/filsnap.d.ts",
+      "default": "./dist/src/filsnap.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "filsnap": [
+        "./dist/src/filsnap"
+      ]
+    }
+  },
+  "files": [
+    "src",
+    "dist/src",
+    "dist/src/**/*.d.ts",
+    "dist/src/**/*.d.ts.map"
+  ],
+  "scripts": {
+    "build": "wireit",
+    "lint": "wireit",
+    "lint:fix": "biome check --fix ."
+  },
+  "wireit": {
+    "build": {
+      "command": "tsc --build --pretty",
+      "clean": "if-file-deleted",
+      "files": [
+        "src/**/*.ts",
+        "tsconfig.json"
+      ],
+      "output": [
+        "dist/**"
+      ],
+      "dependencies": [
+        "../synapse-core:build",
+        "../synapse-sdk:build"
+      ]
+    },
+    "lint": {
+      "command": "biome check .",
+      "files": [
+        "src/**/*.ts",
+        "../../biome.json"
+      ],
+      "output": [],
+      "dependencies": [
+        "build"
+      ]
+    }
+  },
+  "dependencies": {
+    "@filoz/synapse-core": "workspace:^",
+    "@filoz/synapse-sdk": "workspace:^",
+    "@hugomrdias/filsnap-adapter": "^3.3.8"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "catalog:",
+    "@types/node": "catalog:",
+    "type-fest": "^5.7.0",
+    "typescript": "catalog:",
+    "viem": "catalog:"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "msw": {
+    "workerDirectory": [
+      "src/test/mocks"
+    ]
+  },
+  "peerDependencies": {
+    "@tanstack/react-query": "5.x",
+    "@wagmi/core": "3.x",
+    "viem": "2.x",
+    "wagmi": "3.x"
+  }
+}
