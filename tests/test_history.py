@@ -143,7 +143,6 @@ class DeltaTests(unittest.TestCase):
             )
 
 
-
 class HistoryIntegrityTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
@@ -197,6 +196,16 @@ class HistoryIntegrityTests(unittest.TestCase):
 
         (self.output / "run-002-delta.json").write_text("{}")
         with self.assertRaisesRegex(InputError, "delta mismatch"):
+            verify_history(self.output)
+
+    def test_malformed_round_is_an_input_error(self):
+        from evidence_ledger.history import verify_history
+
+        path = self.output / "history.json"
+        data = json.loads(path.read_text())
+        data["runs"][0] = None
+        path.write_text(json.dumps(data))
+        with self.assertRaisesRegex(InputError, "rounds must be objects"):
             verify_history(self.output)
 
     def test_running_history_is_not_claimed_finished_or_sealable(self):

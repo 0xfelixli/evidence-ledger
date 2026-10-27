@@ -1,6 +1,7 @@
 import csv
 import io
 import json
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -9,7 +10,7 @@ from unittest.mock import patch
 from evidence_ledger.audit import run_audit, verify_bundle
 from evidence_ledger.cli import main
 from evidence_ledger.model import InputError, sha256
-from evidence_ledger.render import spreadsheet_safe
+from evidence_ledger.render import render_reports, spreadsheet_safe
 from evidence_ledger.transport import Response
 
 
@@ -202,6 +203,108 @@ class AuditTests(unittest.TestCase):
         self.build()
         (self.out / "unlisted.txt").write_text("surprise")
         with self.assertRaisesRegex(InputError, "file list"):
+            verify_bundle(self.out)
+
+    def test_nested_manifest_is_not_an_exempt_unlisted_file(self):
+        self.build()
+        directory = self.out / "unexpected"
+        directory.mkdir()
+        (directory / "manifest.json").write_text("{}")
+        with self.assertRaisesRegex(InputError, "file list"):
+            verify_bundle(self.out)
+
+    def test_root_manifest_cannot_be_a_symlink(self):
+        self.build()
+        manifest = self.out / "manifest.json"
+        outside = self.root / "external-manifest.json"
+        manifest.rename(outside)
+        manifest.symlink_to(outside)
+        with self.assertRaisesRegex(InputError, "symlink"):
+            verify_bundle(self.out)
+
+    @unittest.skipUnless(hasattr(os, "mkfifo"), "requires POSIX special files")
+    def test_special_file_is_rejected_before_any_blocking_read(self):
+        self.build()
+        os.mkfifo(self.out / "unexpected-pipe")
+        with self.assertRaisesRegex(InputError, "regular files"):
+            verify_bundle(self.out)
+
+    def test_control_json_duplicate_keys_and_nonfinite_numbers_are_rejected(self):
+        self.build()
+        manifest = self.out / "manifest.json"
+        original = manifest.read_text()
+        for extra in ('"algorithm":"sha256"', '"unused":NaN', '"unused":1e9999'):
+            with self.subTest(extra=extra):
+                manifest.write_text(original.rstrip()[:-1] + "," + extra + "}")
+                with self.assertRaisesRegex(InputError, "duplicate|non-finite"):
+                    verify_bundle(self.out)
+
+    def test_manifest_size_is_checked_before_parsing(self):
+        self.build()
+        with patch("evidence_ledger.audit.MAX_MANIFEST_BYTES", 1):
+            with self.assertRaisesRegex(InputError, "size limit"):
+                verify_bundle(self.out)
+
+    def test_invalid_receipts_are_input_errors_not_tracebacks(self):
+        self.build()
+        path = self.out / "report.json"
+        original = json.loads(path.read_text())
+        manifest_path = self.out / "manifest.json"
+        manifest = json.loads(manifest_path.read_text())
+        original_receipt = original["results"][0]["receipts"][0]
+        mutations = [None, [], 7]
+        for field, value in (
+            ("headers", []),
+            ("headers", {"content-type": None}),
+            ("fetched_at", 7),
+            ("truncated", "false"),
+            ("error", {}),
+            ("elapsed_ms", -1),
+            ("http_status", True),
+        ):
+            mutations.append(dict(original_receipt, **{field: value}))
+        for receipt in mutations:
+            with self.subTest(receipt=receipt):
+                report = json.loads(json.dumps(original))
+                report["results"][0]["receipts"][0] = receipt
+                path.write_text(json.dumps(report))
+                manifest["files"]["report.json"] = sha256(path.read_bytes())
+                manifest_path.write_text(json.dumps(manifest))
+                with self.assertRaises(InputError):
+                    verify_bundle(self.out)
+
+    def test_malformed_report_shape_is_an_input_error(self):
+        self.build()
+        report_path = self.out / "report.json"
+        original = report_path.read_bytes()
+        manifest_path = self.out / "manifest.json"
+        manifest = json.loads(manifest_path.read_text())
+        for mutation in ([], {"results": [None]}, {"results": [None] * 5}):
+            with self.subTest(mutation=mutation):
+                report = json.loads(original)
+                if isinstance(mutation, list):
+                    report = mutation
+                else:
+                    report.update(mutation)
+                report_path.write_text(json.dumps(report))
+                manifest["files"]["report.json"] = sha256(report_path.read_bytes())
+                manifest_path.write_text(json.dumps(manifest))
+                with self.assertRaises(InputError):
+                    verify_bundle(self.out)
+
+    def test_unique_source_count_is_recomputed(self):
+        self.build()
+        report_path = self.out / "report.json"
+        report = json.loads(report_path.read_text())
+        report["unique_sources"] = 999
+        report_path.write_text(json.dumps(report))
+        render_reports(self.out, report)
+        manifest_path = self.out / "manifest.json"
+        manifest = json.loads(manifest_path.read_text())
+        for name in ("report.json", "report.html", "review.csv", "corrections.csv"):
+            manifest["files"][name] = sha256((self.out / name).read_bytes())
+        manifest_path.write_text(json.dumps(manifest))
+        with self.assertRaisesRegex(InputError, "source count"):
             verify_bundle(self.out)
 
     def test_manifest_cannot_omit_html(self):

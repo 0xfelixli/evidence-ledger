@@ -128,7 +128,7 @@ python3 run.py seal-history runs/one-hour-pilot
 
 `watch` 冻结开始时的输入，立即执行首轮，后续按间隔运行；错过的时间槽会跳过，不补发请求。截止时间后不再启动新轮次，已经在进行的请求可能在截止时间后完成。`--timeout` 是每次请求的 socket 超时，不是整个批次的硬截止。Ctrl-C 会记录为 `interrupted`；进程意外退出时，页面可能保留 `running`，应结合最后更新时间判断，不能据此认定仍在工作。
 
-两轮之间区分 `source_changed`、`unchanged_verified`、`unavailable`、`recovered`、`configuration_changed`、`record_added`、`record_removed`。即使来源没变，目录仍可能与来源有差异，所以“目录差异数”和“本轮来源变化”分别统计。
+两轮之间区分 `source_changed`、`unchanged_verified`、`unavailable`、`recovered`、`configuration_changed`、`record_added`、`record_removed`。即使来源没变，目录仍可能与来源有差异，所以“目录差异数”和“本轮来源变化”分别统计。来源变化的比较字段固定为 `version`、`license`、`repository`、`repository_directory`、所选口径的 `dependencies` 和 `deprecated`。`unchanged_verified` 仅说明这些字段一致；peer 可选性、依赖分组变化、PyPI yank 状态和其他原始字段的变化，需要结合各轮保存的完整响应另行审核。
 
 ## 退出码与边界
 
@@ -138,7 +138,7 @@ python3 run.py seal-history runs/one-hour-pilot
 - `3`：输入、文件或配置错误；已有输出不会覆盖。
 - `130`：用户中断。
 
-仅请求 `https://registry.npmjs.org` 和 `https://pypi.org`，不发送账户凭据、Cookie 或环境代理，不跟随 HTTP 跳转。默认 4 个并发、一次短重试；429 的长 `Retry-After` 不会被忽略并立即重试。每个响应上限 16 MiB，每轮原始证据上限 256 MiB、规范化结果估算上限 64 MiB，输入上限 8 MiB / 10,000 条记录。来源按有限并发取回和归档，不把所有原始响应留在内存中。报告每页只渲染 50 条；大报告的嵌入 JSON 仍会占用浏览器内存，建议实际服务按几十到数百条分批。
+仅请求 `https://registry.npmjs.org` 和 `https://pypi.org`，不发送账户凭据、Cookie 或环境代理，不跟随 HTTP 跳转。默认 4 个并发、一次短重试；429 的长 `Retry-After` 不会被忽略并立即重试。每个响应上限 16 MiB，每轮原始证据上限 256 MiB、规范化结果估算上限 64 MiB；单个生成/验证文件上限 256 MiB，清单上限 8 MiB。输入上限 8 MiB / 10,000 条记录。来源按有限并发取回和归档，不把所有原始响应留在内存中。报告每页只渲染 50 条；大报告的嵌入 JSON 仍会占用浏览器内存，建议实际服务按几十到数百条分批。
 
 ## 测试
 

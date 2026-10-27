@@ -6,7 +6,7 @@ import time
 from pathlib import Path
 from typing import Any, Dict
 
-from .audit import dump_json, run_audit, verify_bundle
+from .audit import dump_json, read_object, run_audit, verify_bundle
 from .model import InputError, sha256
 from .transport import Transport, utcnow
 
@@ -190,7 +190,6 @@ def watch(
 
 def verify_history(root: Path) -> Dict[str, Any]:
     """Verify completed rounds, frozen input and deltas, including legacy live pilots."""
-    import json
     import re
     import tempfile
 
@@ -199,13 +198,15 @@ def verify_history(root: Path) -> Dict[str, Any]:
 
     root = root.resolve()
     try:
-        index = json.loads(safe_file(root, "history.json").read_text(encoding="utf-8"))
+        index = read_object(safe_file(root, "history.json"), 16 * 1024 * 1024)
         if index.get("format_version") != 1 or index.get("status") not in {
             "running",
             "finished",
             "interrupted",
         }:
             raise InputError("unsupported history format/status")
+        if not all(isinstance(index.get(key), str) for key in ("started_at", "updated_at")):
+            raise InputError("invalid history timestamps")
         raw = safe_file(root, "watch-input.csv").read_bytes()
         if sha256(raw) != index.get("input_sha256"):
             raise InputError("history input hash mismatch")
@@ -219,6 +220,12 @@ def verify_history(root: Path) -> Dict[str, Any]:
         failed = 0
         unknown = 0
         for entry in index["runs"]:
+            if not isinstance(entry, dict):
+                raise InputError("history rounds must be objects")
+            if not isinstance(entry.get("at"), str) or (
+                entry.get("error") is not None and not isinstance(entry["error"], str)
+            ):
+                raise InputError("invalid history round metadata")
             name = entry.get("run")
             if (
                 not isinstance(name, str)
@@ -240,7 +247,7 @@ def verify_history(root: Path) -> Dict[str, Any]:
             if previous is not None:
                 delta_name = name + "-delta.json"
                 expected = compare_reports(previous, report)
-                actual = json.loads(safe_file(root, delta_name).read_text(encoding="utf-8"))
+                actual = read_object(safe_file(root, delta_name))
                 if actual != expected or entry.get("delta_summary") != expected["summary"]:
                     raise InputError("history delta mismatch: " + name)
                 files.add(delta_name)
@@ -259,11 +266,12 @@ def verify_history(root: Path) -> Dict[str, Any]:
         seal_path = root / "history-manifest.json"
         sealed = seal_path.exists()
         if sealed:
-            seal = json.loads(safe_file(root, "history-manifest.json").read_text(encoding="utf-8"))
+            seal = read_object(safe_file(root, "history-manifest.json"), 16 * 1024 * 1024)
             if (
                 index["status"] == "running"
                 or seal.get("format_version") != 1
                 or seal.get("algorithm") != "sha256"
+                or not isinstance(seal.get("files"), dict)
                 or set(seal.get("files", {})) != files
             ):
                 raise InputError("invalid history seal")

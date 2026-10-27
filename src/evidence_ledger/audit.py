@@ -1,6 +1,7 @@
 """Audit orchestration and self-contained evidence bundles."""
 
 import json
+import math
 import shutil
 import tempfile
 import threading
@@ -25,6 +26,62 @@ from .transport import (
 FORMAT_VERSION = 1
 MAX_ARCHIVE_BYTES = 256 * 1024 * 1024
 MAX_RESULT_BYTES = 64 * 1024 * 1024
+MAX_MANIFEST_BYTES = 8 * 1024 * 1024
+MAX_BUNDLE_FILE_BYTES = 256 * 1024 * 1024
+
+
+def read_object(path: Path, limit: int = MAX_BUNDLE_FILE_BYTES) -> Dict[str, Any]:
+    """Read a bounded, unambiguous control document, never a special file."""
+    if path.is_symlink() or not path.is_file():
+        raise InputError("control document must be a regular file: " + path.name)
+    if path.stat().st_size > limit:
+        raise InputError("control document exceeds size limit: " + path.name)
+    with path.open("rb") as source:
+        raw = source.read(limit + 1)
+    if len(raw) > limit:
+        raise InputError("control document exceeds size limit: " + path.name)
+
+    def reject_constant(value):
+        raise InputError("non-finite control JSON number: " + value)
+
+    def finite_float(value):
+        number = float(value)
+        if not math.isfinite(number):
+            reject_constant(value)
+        return number
+
+    def unique_object(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                raise InputError("duplicate control JSON key: " + key)
+            result[key] = value
+        return result
+
+    try:
+        data = json.loads(
+            raw.decode("utf-8"),
+            object_pairs_hook=unique_object,
+            parse_constant=reject_constant,
+            parse_float=finite_float,
+        )
+        pending = [(data, 0)]
+        while pending:
+            value, depth = pending.pop()
+            if depth > 64:
+                raise InputError("control JSON nesting is too deep")
+            if isinstance(value, str):
+                value.encode("utf-8")
+            elif isinstance(value, dict):
+                pending.extend((key, depth + 1) for key in value)
+                pending.extend((item, depth + 1) for item in value.values())
+            elif isinstance(value, list):
+                pending.extend((item, depth + 1) for item in value)
+    except RecursionError as exc:
+        raise InputError("control JSON nesting is too deep") from exc
+    if not isinstance(data, dict):
+        raise InputError("control JSON must be an object: " + path.name)
+    return data
 
 
 def dump_json(path: Path, value: Any):
@@ -51,13 +108,17 @@ def finish_bundle(root: Path, report: Dict[str, Any]):
     dump_json(root / "report.json", report)
     render_reports(root, report)
     # The manifest detects accidental corruption. It is not a digital signature.
-    paths = [p for p in root.rglob("*") if p.is_file() and p.name != "manifest.json"]
+    paths = [p for p in root.rglob("*") if p.is_file() and p != root / "manifest.json"]
+    if any(p.stat().st_size > MAX_BUNDLE_FILE_BYTES for p in paths):
+        raise InputError("generated file exceeds 256 MiB; split the input into smaller batches")
     manifest = {
         "format_version": FORMAT_VERSION,
         "algorithm": "sha256",
         "files": {p.relative_to(root).as_posix(): sha256(p.read_bytes()) for p in sorted(paths)},
     }
     dump_json(root / "manifest.json", manifest)
+    if (root / "manifest.json").stat().st_size > MAX_MANIFEST_BYTES:
+        raise InputError("generated manifest exceeds 8 MiB; split the input into smaller batches")
 
 
 def run_audit(
@@ -225,7 +286,7 @@ def safe_file(root: Path, relative: str) -> Path:
 def verify_bundle(root: Path) -> Dict[str, Any]:
     root = root.resolve()
     try:
-        manifest = json.loads((root / "manifest.json").read_text(encoding="utf-8"))
+        manifest = read_object(safe_file(root, "manifest.json"), MAX_MANIFEST_BYTES)
         if (
             manifest.get("format_version") != FORMAT_VERSION
             or manifest.get("algorithm") != "sha256"
@@ -248,6 +309,22 @@ def verify_bundle(root: Path) -> Dict[str, Any]:
         }
         if not required_files.issubset(entries):
             raise InputError("manifest is missing generated report files")
+        for relative in entries:
+            safe_file(root, relative)
+        actual_files = set()
+        for path in root.rglob("*"):
+            if path.is_symlink():
+                raise InputError("symlinks are not allowed in bundles")
+            if path.is_dir():
+                continue
+            if not path.is_file():
+                raise InputError("bundle entries must be regular files")
+            if path.stat().st_size > MAX_BUNDLE_FILE_BYTES:
+                raise InputError("bundle file exceeds 256 MiB")
+            if path != root / "manifest.json":
+                actual_files.add(path.relative_to(root).as_posix())
+        if actual_files != set(entries):
+            raise InputError("bundle file list differs from manifest")
         for relative, expected in entries.items():
             path = safe_file(root, relative)
             if (
@@ -256,24 +333,27 @@ def verify_bundle(root: Path) -> Dict[str, Any]:
                 or sha256(path.read_bytes()) != expected
             ):
                 raise InputError("integrity failure: " + relative)
-        actual_files = {
-            p.relative_to(root).as_posix()
-            for p in root.rglob("*")
-            if p.is_file() and p.name != "manifest.json"
-        }
-        if actual_files != set(entries):
-            raise InputError("bundle file list differs from manifest")
-        report = json.loads(safe_file(root, "report.json").read_text(encoding="utf-8"))
+        report = read_object(safe_file(root, "report.json"))
         if report.get("format_version") != FORMAT_VERSION:
             raise InputError("unsupported report format")
         raw = safe_file(root, "input.csv").read_bytes()
         if sha256(raw) != report.get("input_sha256"):
             raise InputError("input hash does not match report")
         records = parse_csv(raw)
+        unique_sources = len({(r.ecosystem, r.package, r.selector) for r in records})
+        if (
+            type(report.get("unique_sources")) is not int
+            or report["unique_sources"] != unique_sources
+        ):
+            raise InputError("unique source count does not match input")
+        if report.get("mode") not in {"live", "offline"}:
+            raise InputError("invalid audit mode")
         results = report.get("results")
         if not isinstance(results, list) or len(results) != len(records):
             raise InputError("report record count does not match input")
         for record, result in zip(records, results):
+            if not isinstance(result, dict):
+                raise InputError("report results must be objects")
             if result.get("record") != record.as_dict():
                 raise InputError("report record identity/expectations differ from input")
             url = registry_url(record.ecosystem, record.package, record.selector)
@@ -283,6 +363,24 @@ def verify_bundle(root: Path) -> Dict[str, Any]:
             if not isinstance(receipts, list) or not receipts:
                 raise InputError("record has no source receipts")
             for receipt in receipts:
+                if not isinstance(receipt, dict) or not isinstance(receipt.get("headers"), dict):
+                    raise InputError("invalid source receipt structure")
+                if (
+                    any(
+                        not isinstance(k, str) or not isinstance(v, str)
+                        for k, v in receipt["headers"].items()
+                    )
+                    or not isinstance(receipt.get("fetched_at"), str)
+                    or type(receipt.get("elapsed_ms")) is not int
+                    or receipt["elapsed_ms"] < 0
+                    or type(receipt.get("truncated")) is not bool
+                    or (
+                        receipt.get("http_status") is not None
+                        and type(receipt["http_status"]) is not int
+                    )
+                    or (receipt.get("error") is not None and not isinstance(receipt["error"], str))
+                ):
+                    raise InputError("invalid source receipt structure")
                 if receipt.get("url") != url:
                     raise InputError("receipt URL does not match record")
                 validate_url(receipt["url"])
@@ -305,7 +403,11 @@ def verify_bundle(root: Path) -> Dict[str, Any]:
             for field in ("observed", "state", "differences", "unknown_fields", "error"):
                 if replayed[field] != result.get(field):
                     raise InputError("recomputed result differs: " + record.record_id + "/" + field)
-        if report.get("summary") != summary(results):
+        if (
+            not isinstance(report.get("summary"), dict)
+            or any(type(value) is not int for value in report["summary"].values())
+            or report["summary"] != summary(results)
+        ):
             raise InputError("summary does not match records")
         # Rebuild the user-facing exports too: rehashing an edited HTML file
         # must not make a false report agree with an otherwise valid JSON audit.
