@@ -59,6 +59,8 @@ Partially unknown records retain any known differences and still count as unavai
 
 Each new output directory contains `input.csv`, `report.json`, `report.html`, `review.csv`, `corrections.csv`, `manifest.json`, and content-addressed raw bodies under `evidence/`. Existing destinations are never reused. Reports support search, state filters and filtered CSV export. Exports guard common spreadsheet-formula prefixes; use JSON for exact original values.
 
+Complete files are staged on the same filesystem, then published by renaming over an empty directory reservation. SIGKILL can leave an orphan `.evidence-ledger-*` staging directory or an empty reserved destination; neither is a successful report, and `verify` rejects the empty destination. Use a fresh output path to rerun. This protocol is not a power-loss durability guarantee; no disk or power-failure test was performed.
+
 ## Verify and monitor
 
 `verify` runs completely offline: it checks inventory/hashes, input identity, receipt structure, source normalization, counts, and regenerated HTML/CSV content. It rejects symlinks, special files, ambiguous control JSON and oversized files. A manifest provides internal consistency, not a digital signature, authentic historical timestamp or protection against a coordinated rewrite of the whole bundle.

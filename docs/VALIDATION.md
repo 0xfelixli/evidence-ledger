@@ -85,3 +85,9 @@ The portable builder was additionally exercised with an unlisted sentinel note i
 ## Input failure-path follow-up
 
 Two additional adversarial inputs reproduced uncaught parser exceptions: an unterminated or overlong CSV header and a deeply nested dependency assertion. Both now raise the documented input error before any registry request. Two regression methods bring the local suite to 84 passing methods. This change affects malformed input handling; valid saved bundles and the already-running pilot remain compatible.
+
+## Actual subprocess boundary checks
+
+On the macOS host, four separate subprocesses were deliberately killed with SIGKILL after actual source archiving, after bundle generation, after destination reservation, and after the directory rename. Sources were clearly marked artificial/offline and DNS/socket creation was blocked. The first two final destinations were absent; killing after reservation left an empty destination and an orphan staging directory, rejected by the verifier. Killing after rename left a complete independently verified bundle. This establishes the observed failure boundaries, not power-loss durability or every possible interleaving.
+
+Two further actual subprocesses reached the publication boundary together with different fixture versions. One completed, one exited with the expected input/conflict error, the winner's bundle verified, and the loser did not overwrite it. Receipt: `artifacts/process-boundary-acceptance.json`. These are separate integration experiments; they do not inflate the 84-method unittest count or real-package findings.

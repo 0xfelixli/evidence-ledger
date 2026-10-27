@@ -18,3 +18,4 @@ include artifacts/qa/desktop.png
 include artifacts/benchmark-distinct-5000-metrics.json
 include artifacts/cloud-run-receipt.json
 include artifacts/local-to-cloud-delta.json
+include artifacts/process-boundary-acceptance.json

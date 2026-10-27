@@ -1,0 +1,58 @@
+{
+  "scope": "Synthetic source data; real subprocesses, SIGKILL and competing directory publication on this macOS host. DNS and sockets forbidden. This does not simulate power loss, filesystem corruption or every interleaving.",
+  "sigkill_checks": [
+    {
+      "boundary": "source_archived",
+      "actual_exit": -9,
+      "destination_state": "absent",
+      "offline_verifier_accepts": false,
+      "verifier_error": "control document must be a regular file: manifest.json",
+      "orphan_staging_directories": 1
+    },
+    {
+      "boundary": "bundle_ready",
+      "actual_exit": -9,
+      "destination_state": "absent",
+      "offline_verifier_accepts": false,
+      "verifier_error": "control document must be a regular file: manifest.json",
+      "orphan_staging_directories": 1
+    },
+    {
+      "boundary": "destination_reserved",
+      "actual_exit": -9,
+      "destination_state": "empty_reservation",
+      "offline_verifier_accepts": false,
+      "verifier_error": "control document must be a regular file: manifest.json",
+      "orphan_staging_directories": 1
+    },
+    {
+      "boundary": "bundle_published",
+      "actual_exit": -9,
+      "destination_state": "complete_verified",
+      "offline_verifier_accepts": true,
+      "verifier_error": null,
+      "orphan_staging_directories": 0
+    }
+  ],
+  "concurrent_publication": {
+    "exit_codes": [
+      0,
+      3
+    ],
+    "winner_fixture_version": "1",
+    "complete_bundle_verified": true,
+    "loser_did_not_overwrite": true,
+    "logs": [
+      {
+        "exit": 0,
+        "stdout": "{\"completed\": \"1\"}\n",
+        "stderr": ""
+      },
+      {
+        "exit": 3,
+        "stdout": "{\"error\": \"output appeared during audit; refusing to overwrite\"}\n",
+        "stderr": ""
+      }
+    ]
+  }
+}
