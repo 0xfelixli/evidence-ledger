@@ -119,9 +119,18 @@ class WorkbenchTests(unittest.TestCase):
         self.assertEqual(job["summary"]["unchanged"], 0)
 
     def test_bad_csv_never_queues_job(self):
-        status, _, raw = self.submit(b"record_id,ecosystem,package\na,npm,../evil\n")
-        self.assertEqual(status, 400)
-        self.assertIn("error", json.loads(raw))
+        from test_model import make_csv
+
+        for data in [
+            b"record_id,ecosystem,package\na,npm,../evil\n",
+            b'"unterminated',
+            b"x" * 200000 + b"\n",
+            make_csv(expected_dependencies="[" * 2000 + '"x"' + "]" * 2000),
+        ]:
+            with self.subTest(size=len(data)):
+                status, _, raw = self.submit(data)
+                self.assertEqual(status, 400)
+                self.assertIn("error", json.loads(raw))
         self.assertEqual(self.server.manager.all(), [])
 
     def test_unknown_job_and_traversal_do_not_expose_files(self):

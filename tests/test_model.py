@@ -70,6 +70,16 @@ class InputTests(unittest.TestCase):
         with self.assertRaisesRegex(InputError, "duplicate record_id"):
             parse_csv(("\n".join(raw + raw[1:]) + "\n").encode())
 
+    def test_malformed_header_is_an_input_error(self):
+        for raw in [b'"unterminated', b"x" * 200000 + b"\n"]:
+            with self.subTest(size=len(raw)), self.assertRaisesRegex(InputError, "CSV header"):
+                parse_csv(raw)
+
+    def test_deep_dependency_json_is_an_input_error(self):
+        raw = make_csv(expected_dependencies="[" * 2000 + '"x"' + "]" * 2000)
+        with self.assertRaisesRegex(InputError, "JSON string array"):
+            parse_csv(raw)
+
     def test_wrong_shape_and_headers(self):
         for raw in [
             b"",

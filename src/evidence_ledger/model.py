@@ -109,7 +109,10 @@ def parse_csv(raw: bytes) -> List[Record]:
     except UnicodeDecodeError as exc:
         raise InputError("input must be UTF-8 CSV") from exc
     reader = csv.DictReader(io.StringIO(text, newline=""), strict=True)
-    headers = reader.fieldnames
+    try:
+        headers = reader.fieldnames
+    except csv.Error as exc:
+        raise InputError("invalid CSV header: " + str(exc)) from exc
     if not headers or len(headers) != len(set(headers)):
         raise InputError("CSV headers must be present and unique")
     required = {"record_id", "ecosystem", "package"}
@@ -158,7 +161,7 @@ def parse_csv(raw: bytes) -> List[Record]:
             if deps:
                 try:
                     parsed = json.loads(deps)
-                except (ValueError, TypeError) as exc:
+                except (ValueError, TypeError, RecursionError) as exc:
                     raise InputError(
                         "row %d: expected_dependencies must be a JSON string array" % line
                     ) from exc

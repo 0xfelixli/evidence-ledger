@@ -81,3 +81,7 @@ Measured on this host: audit with tracemalloc 3.547 seconds; verification withou
 The long-running live pilot was started with the development code loaded at 16:05 UTC; later source edits do not retroactively upgrade that process. Its ended bundles will be checked with the final release verifier. Only entries actually present in its history count as completed observations.
 
 The portable builder was additionally exercised with an unlisted sentinel note in the smoke-history directory. The note and its contents were absent from the resulting ZIP: only sealed index/delta files and transitively manifest-listed round files were copied. The real long-running history is still kept separate until ended.
+
+## Input failure-path follow-up
+
+Two additional adversarial inputs reproduced uncaught parser exceptions: an unterminated or overlong CSV header and a deeply nested dependency assertion. Both now raise the documented input error before any registry request. Two regression methods bring the local suite to 84 passing methods. This change affects malformed input handling; valid saved bundles and the already-running pilot remain compatible.
