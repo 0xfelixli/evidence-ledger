@@ -13,6 +13,10 @@ readme = "README.md"
 authors = [{name = "Felix Research"}]
 dependencies = []
 
+[project.urls]
+Source = "https://github.com/0xfelixli/evidence-ledger"
+Issues = "https://github.com/0xfelixli/evidence-ledger/issues"
+
 [project.scripts]
 evidence-ledger = "evidence_ledger.cli:main"
 
